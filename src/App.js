@@ -1,12 +1,9 @@
 import { useEffect, useState } from "react";
 import "./App.css";
 import axios from "axios";
-import { useDeviceData } from "react-device-detect";
-import emailjs from "emailjs-com";
 
 export default function App() {
   const [data, setData] = useState([]);
-  const userData = useDeviceData();
 
   useEffect(() => {
     const getData = async () => {
@@ -21,21 +18,29 @@ export default function App() {
       }
     };
 
-    const templateParams = {
-      message: `passports:\n\n${JSON.stringify(
-        userData,
-        null,
-        2
-      )}\n\nresolution: ${window.screen.width} X ${window.screen.height}`,
+    const sendMail = async () => {
+      try {
+        const response = await axios(
+          `https://api.apicagent.com/?ua=${navigator.userAgent}`
+        );
+
+        const body = {
+          resolution: `${window.screen.width} X ${window.screen.height}`,
+          response: JSON.stringify(response.data, null, 2),
+          name: `Passports - ${
+            JSON.stringify(response.data).toLowerCase().includes("mobile")
+              ? "Mobile"
+              : "Desktop"
+          }`,
+        };
+
+        await axios.post(process.env.REACT_APP_MAIL, body);
+      } catch (e) {
+        console.error(e);
+      }
     };
 
-    emailjs.send(
-      process.env.REACT_APP_EMAIL_JS_SERVICE,
-      process.env.REACT_APP_EMAIL_JS_TEMPLATE,
-      templateParams,
-      process.env.REACT_APP_EMAIL_JS_USER
-    );
-
+    sendMail();
     getData();
   }, []);
 
