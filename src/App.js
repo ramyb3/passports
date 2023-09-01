@@ -42,9 +42,11 @@ export default function App() {
 
   return (
     <>
-      <header>*המידע מתעדכן אחת ל-5 דקות ע"י משרד הפנים*</header>
       {data[0]?.lastupdate ? (
-        <div>תאריך עדכון נתונים: {data[0].lastupdate}</div>
+        <>
+          <header>*המידע מתעדכן אחת ל-5 דקות ע"י משרד הפנים*</header>
+          <div>תאריך עדכון נתונים: {data[0].lastupdate}</div>
+        </>
       ) : null}
 
       {data.length > 0 ? (
@@ -72,7 +74,9 @@ export default function App() {
             );
           })}
         </div>
-      ) : null}
+      ) : (
+        <header>*אין מידע ממשרד הפנים*</header>
+      )}
     </>
   );
 }
